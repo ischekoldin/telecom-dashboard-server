@@ -166,7 +166,7 @@ app.get("/token", (req, res) => {
             if (validRefreshTokenInDb !== refreshToken) return res.sendStatus(401);
         }
 
-        res.cookie('unnotateUserName', name, USER_NAME_COOKIE_OPTIONS);
+        res.cookie('telecom-dashboard-user-name', name, USER_NAME_COOKIE_OPTIONS);
         const accessToken = generateAccessToken({name: name});
         return res.json({accessToken: accessToken, name: name});
     });
@@ -186,19 +186,38 @@ app.delete("/logout", async (req, res) => {
 });
 
 
-app.get("/profile", authenticateToken, async (req, res) => {
+
+
+app.post("/dashboard", authenticateToken, async (req, res) => {
     //const dbResponse = await pool.query("SELECT * FROM notes WHERE note_owner_name = $1", [req.user.name]);
-    await res.json(json_dummy_user);
+
+    const {section, page} = req.body;
+    console.log(section, page);
+
+    // the awkward "tabs" is used instead of "pages" because the "pages" is a keyword
+    if ( section !== "profile") {
+
+        const responseWithContent = {
+            "content": json_dummy_user[section].tabs[page - 1],
+            "section": section,
+            "tabsCount": json_dummy_user[section].tabs_count
+        };
+        await res.json(responseWithContent);
+
+    } else {
+
+        const responseWithContent = {
+            "content": json_dummy_user[section],
+            "section": section
+        };
+        await res.json(responseWithContent);
+
+    }
+
 });
 
 
-app.get("/dashboard", authenticateToken, async (req, res) => {
-    //const dbResponse = await pool.query("SELECT * FROM notes WHERE note_owner_name = $1", [req.user.name]);
-    await res.json(json_dummy.objects);
-});
-
-
-
+console.log(json_dummy_user.lines.tabs[0]);
 
 // TODO get rid of callbacks and add feedback
 app.post("/auth/change_password", async (req, res) => {
