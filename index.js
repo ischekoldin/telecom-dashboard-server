@@ -12,7 +12,7 @@ const app = express();
 
 const router = require('./router');
 const pool = require('./db/index');
-const json_dummy = require("./db/json");
+
 const json_dummy_user = require("./db/user");
 
 
@@ -200,7 +200,8 @@ app.post("/dashboard", authenticateToken, async (req, res) => {
         const responseWithContent = {
             "content": json_dummy_user[section].tabs[page - 1],
             "section": section,
-            "tabsCount": json_dummy_user[section].tabs_count
+            "tabsCount": json_dummy_user[section].tabs_count,
+            "tab": page
         };
         await res.json(responseWithContent);
 
