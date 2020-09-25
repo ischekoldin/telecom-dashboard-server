@@ -130,8 +130,7 @@ app.post ("/signup", async (req, res) => {
 
         if (usersWithThisNameOrEmail === 0) {
 
-            const date = new Date;
-            date.setDate(date.now());
+            let date = new Date(Date.now());
 
             const saltRounds = 10;
             await bcrypt.hash(password, saltRounds, function (err, hashedPassword) {
