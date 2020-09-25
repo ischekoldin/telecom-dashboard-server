@@ -116,6 +116,8 @@ async function userInDb (email) {
     const isThereOnlyOne = userProfileDbResponse.rowCount === 1;
     const data = userProfileDbResponse.rows[0];
 
+    console.log(isThereOnlyOne);
+
     return {isThereOnlyOne: isThereOnlyOne, data: data}
 }
 
@@ -169,7 +171,7 @@ app.get ("/email/verify", authenticateEmailToken, async (req, res) => {
         let dbresponse;
 
         if (user.isThereOnlyOne) {
-            dbresponse = await pool.query("UPDATE users SET user_active=$1 WHERE user_email=$2", ['true', email]);
+            dbresponse = await pool.query("UPDATE users SET user_active=true WHERE user_email=$1", [email]);
         }
 
         console.log(dbresponse);
