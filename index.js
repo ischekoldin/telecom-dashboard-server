@@ -86,13 +86,23 @@ function authenticateEmailToken(req, res, next) {
 }
 
 
+async function userInDb (email) {
+    const userProfileDbResponse = await pool.query(`SELECT * FROM users WHERE user_email=$1`, [email]);
+    const isThereOnlyOne = userProfileDbResponse.rowCount === 1;
+    const data = userProfileDbResponse.rows[0];
+
+    console.log(isThereOnlyOne);
+
+    return {isThereOnlyOne: isThereOnlyOne, data: data}
+}
+
+
 async function checkPassword (email, password) {
     try {
-        const dbResponse = await pool.query("SELECT * FROM users WHERE user_email = $1", [email]);
-        const numberOfUsers = dbResponse.rowCount;
+        const user = await userInDb(email);
 
-        if (numberOfUsers === 1) {
-            const hashedPassword = dbResponse.rows[0].user_password;
+        if (user.isThereOnlyOne) {
+            const hashedPassword = user.data.user_password;
             const isPasswordCorrect = await bcrypt.compare(password, hashedPassword);
 
             if (isPasswordCorrect) {
@@ -111,15 +121,7 @@ async function checkPassword (email, password) {
 }
 
 
-async function userInDb (email) {
-    const userProfileDbResponse = await pool.query(`SELECT * FROM users WHERE user_email=$1`, [email]);
-    const isThereOnlyOne = userProfileDbResponse.rowCount === 1;
-    const data = userProfileDbResponse.rows[0];
 
-    console.log(isThereOnlyOne);
-
-    return {isThereOnlyOne: isThereOnlyOne, data: data}
-}
 
 
 app.post ("/signup", async (req, res) => {
@@ -133,12 +135,13 @@ app.post ("/signup", async (req, res) => {
 
         if (usersWithThisNameOrEmail === 0) {
 
-            let date = new Date(Date.now());
+            const date = new Date(Date.now());
+            const dummyBalance = Math.floor(Math.random() * 1000000);
 
             const saltRounds = 10;
             await bcrypt.hash(password, saltRounds, function (err, hashedPassword) {
-                pool.query ("INSERT INTO users (user_name, user_email, user_password, registration_date) VALUES ($1, $2, $3, $4)",
-                    [name, email, hashedPassword, date]);
+                pool.query ("INSERT INTO users (user_name, user_email, user_password, registration_date, account_balance) VALUES ($1, $2, $3, $4, $5)",
+                    [name, email, hashedPassword, date, dummyBalance]);
             });
 
             const token = await generateEmailVerificationToken({email});
@@ -168,14 +171,9 @@ app.get ("/email/verify", authenticateEmailToken, async (req, res) => {
 
         const user = await userInDb(email);
 
-        let dbresponse;
-
         if (user.isThereOnlyOne) {
-            dbresponse = await pool.query("UPDATE users SET user_active=true WHERE user_email=$1", [email]);
+            await pool.query("UPDATE users SET user_active=true WHERE user_email=$1", [email]);
         }
-
-        console.log(email);
-        console.log(dbresponse);
 
         res.sendStatus(200);
 
@@ -231,7 +229,7 @@ app.post ("/login", async (req, res) => {
             } else {
 
                 errors.push({place: "post /login", error: "Password is incorrect"});
-                res.sendStatus(401);
+                res.send("password is incorrect");
 
             }
 
@@ -400,17 +398,20 @@ app.post("/dashboard/edit-user-profile", authenticateToken, async (req, res) => 
 
 // TODO get rid of callbacks and add feedback
 app.post("/auth/change_password", async (req, res) => {
-    const { user, oldPassword, newPassword } = req.body;
+    const { email, oldPassword, newPassword } = req.body;
 
     try {
-        const checkPasswordResponse = await checkPassword(user, oldPassword);
+        const checkPasswordResponse = await checkPassword(email, oldPassword);
         if (checkPasswordResponse === 'password is correct') {
             const saltRounds = 10;
             let changePasswordResponse;
             await bcrypt.hash(newPassword, saltRounds, (err, hashedPassword) => {
-                changePasswordResponse =  pool.query ("UPDATE users SET user_password=$1 WHERE user_name=$2",
-                    [hashedPassword, user]);
+                changePasswordResponse =  pool.query ("UPDATE users SET user_password=$1 WHERE user_email=$2",
+                    [hashedPassword, email]);
+                console.log(changePasswordResponse);
             });
+        } else {
+            res.status(403).send("password is incorrect");
         }
         res.sendStatus(200);
 
