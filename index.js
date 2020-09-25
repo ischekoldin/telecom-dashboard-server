@@ -162,7 +162,7 @@ app.get ("/email/verify", authenticateEmailToken, async (req, res) => {
 
     try {
 
-        const email = req.user.email;
+        const email = req.email;
 
         const user = await userInDb(email);
 
