@@ -5,14 +5,14 @@ const cors = require('cors');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-
+const utils = require("./utils/utils");
 
 
 const app = express();
 
 const router = require('./router');
 const pool = require('./db/index');
-const utils = require("./utils/utils");
+
 const sendVerificationEmail = require("./mailer/index.js");
 
 const json_dummy_user = require("./db/user");
@@ -26,6 +26,8 @@ const CORS_OPTIONS = {
     credentials: true,
     preflightContinue: true
 };
+
+console.log(CORS_OPTIONS);
 
 const USER_EMAIL_COOKIE_OPTIONS = { expires: utils.cookieExpiresIn(14), httpOnly: false, sameSite: "none", secure: true};
 
@@ -41,7 +43,6 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 app.use(cors(CORS_OPTIONS));
 app.use(express.json());
 app.use(cookieParser());
-
 
 
 let errors = [];
