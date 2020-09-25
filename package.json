@@ -1,7 +1,7 @@
 {
-  "name": "unnotate-server",
+  "name": "telecom-dashboard-server",
   "version": "0.9.0",
-  "description": "Backend for unNotate app",
+  "description": "Backend for Telecom Dashboard app",
   "main": "index.js",
   "scripts": {
     "devstart": "nodemon index.js",
