@@ -166,9 +166,13 @@ app.get ("/email/verify", authenticateEmailToken, async (req, res) => {
 
         const user = await userInDb(email);
 
+        let dbresponse;
+
         if (user.isThereOnlyOne) {
-            await pool.query("UPDATE users SET user_active=$1 WHERE user_email=$2", [true, email]);
+            dbresponse = await pool.query("UPDATE users SET user_active=$1 WHERE user_email=$2", ['true', email]);
         }
+
+        console.log(dbresponse);
 
         res.sendStatus(200);
 
