@@ -12,7 +12,7 @@ let transporter = nodemailer.createTransport({
 module.exports = async function sendVerificationEmail (mailTarget, token) {
 
     console.log(mailTarget, token);
-    const verificationLink = `href=http://localhost:5000/email/verify?token=${token}`;
+    const verificationLink = `https://telecom-dashboard-server.herokuapp.com/email/verify?token=${token}`;
 
     const mailOptions = {
          from: "service.email.ischekoldin@gmail.com",
