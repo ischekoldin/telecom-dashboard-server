@@ -174,6 +174,7 @@ app.get ("/email/verify", authenticateEmailToken, async (req, res) => {
             dbresponse = await pool.query("UPDATE users SET user_active=true WHERE user_email=$1", [email]);
         }
 
+        console.log(email);
         console.log(dbresponse);
 
         res.sendStatus(200);
