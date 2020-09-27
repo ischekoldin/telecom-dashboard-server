@@ -152,7 +152,7 @@ app.post ("/signup", async (req, res) => {
         } else {
 
             errors.push({place: "post /signup", error: `User with email ${email} already exists`});
-            res.send({error: `User with email ${email} already exists`});
+            res.status(403).send("user with this email already exists");
         }
 
     } catch (err) {
@@ -227,7 +227,7 @@ app.post ("/login", async (req, res) => {
             } else {
 
                 errors.push({place: "post /login", error: "Password is incorrect"});
-                res.send("password is incorrect");
+                res.status(403).send("password is incorrect");
 
             }
 
