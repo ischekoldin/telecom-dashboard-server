@@ -152,7 +152,7 @@ app.post ("/signup", async (req, res) => {
         } else {
 
             errors.push({place: "post /signup", error: `User with email ${email} already exists`});
-            res.sendStatus(403);
+            res.send({error: `User with email ${email} already exists`});
         }
 
     } catch (err) {
@@ -208,8 +208,6 @@ app.post ("/login", async (req, res) => {
 
                const accessToken = await generateAccessToken({email});
                const refreshToken = await jwt.sign(email, process.env.REFRESH_TOKEN_SECRET);
-
-                console.log(accessToken, refreshToken);
 
                const dbValidTokens = await pool.query("SELECT * FROM valid_refresh_tokens WHERE user_email = $1", [email]);
                const hasUserGotValidToken = dbValidTokens.rowCount > 0;
