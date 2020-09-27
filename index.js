@@ -1,17 +1,17 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const utils = require("./utils/utils");
 
 
 const app = express();
 
-const router = require('./router');
-const pool = require('./db/index');
+const router = require("./router");
+const pool = require("./db/index");
 
 const sendVerificationEmail = require("./mailer/index.js");
 
@@ -33,7 +33,7 @@ const USER_EMAIL_COOKIE_OPTIONS = { expires: utils.cookieExpiresIn(14), httpOnly
 
 let REFRESH_TOKEN_COOKIE_OPTIONS;
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     REFRESH_TOKEN_COOKIE_OPTIONS = { expires: utils.cookieExpiresIn(14), httpOnly: true, sameSite: "lax"};
 } else {
     REFRESH_TOKEN_COOKIE_OPTIONS = { expires: utils.cookieExpiresIn(14), httpOnly: true, sameSite: "none", secure: true};
@@ -49,21 +49,20 @@ let errors = [];
 
 
 function generateAccessToken(user) {
-    console.log(user);
-    const TOKEN_EXPIRATION_TIME = '15m';
+    const TOKEN_EXPIRATION_TIME = "15m";
     return  jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: TOKEN_EXPIRATION_TIME });
 }
 
 
 function generateEmailVerificationToken(email) {
-    const TOKEN_EXPIRATION_TIME = '15m';
+    const TOKEN_EXPIRATION_TIME = "15m";
     return  jwt.sign(email, process.env.EMAIL_VERIFICATION_SECRET, { expiresIn: TOKEN_EXPIRATION_TIME });
 }
 
 
 function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
     if (!token) return res.sendStatus(401);
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
@@ -106,13 +105,13 @@ async function checkPassword (email, password) {
             const isPasswordCorrect = await bcrypt.compare(password, hashedPassword);
 
             if (isPasswordCorrect) {
-                return 'password is correct'
+                return "password is correct"
             } else {
-                return new Error('password is incorrect')
+                return new Error("password is incorrect")
             }
 
         } else {
-            return new Error('user not found')
+            return new Error("user not found")
         }
 
     } catch (err) {
@@ -293,11 +292,8 @@ app.delete("/logout", async (req, res) => {
 
 
 app.post("/dashboard", authenticateToken, async (req, res) => {
-    //const dbResponse = await pool.query("SELECT * FROM notes WHERE note_owner_name = $1", [req.user.name]);
-
 
     const {section, page} = req.body;
-    //console.log(section, page);
 
     const email = req.user.email;
     const user = await userInDb(email);

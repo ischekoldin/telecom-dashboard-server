@@ -23,13 +23,10 @@ module.exports = async function sendVerificationEmail (mailTarget, token) {
 
 
     await transporter.sendMail(mailOptions, (err, info) => {
-        console.log(mailOptions);
         if (err) {
-            console.log(err);
-            return err
+            return err;
         } else {
-            console.log(info);
-            return info
+            return info;
         }
     })
 };
