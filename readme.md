@@ -1,7 +1,7 @@
-# UnNotate Server
+# Telecom Dashboard Server
 
-UnNotate server is a backend for UnNotate note taking app. 
-The frontend is built using:
+Telecom Dashboard server is a backend for Telecom Dashboard, a demo client area of a telecommunications company. 
+The backend is built using:
  * Node.js
  * Postgres
  * JWT
@@ -9,7 +9,7 @@ The frontend is built using:
 
 ## Installation
 
-git clone https://github.com/ischekoldin/unnotate-server.git
+git clone https://github.com/ischekoldin/telecom-dashboard-server.git
 
 ## Usage
 
@@ -22,9 +22,9 @@ npm start
 
 ## Important
 
- * UnNotate saves session using cross site cookies. Modern browsers require those to be sent only through https://.
+ * Telecom Dashboard saves session using cross site cookies. Modern browsers require those to be sent only through https://.
 Therefore, your frontend has to be accessed through https. However, if you host both frontend and backend on the same domain,
-you can set `sameSite` in `src/DashBoard/DashBoardd.js` in `REFRESH_TOKEN_COOKIE_OPTIONS` to `"lax"` and `secure` option to `"false"`
+you can set `sameSite` in `src/DashBoard/DashBoard.js` in `REFRESH_TOKEN_COOKIE_OPTIONS` to `"lax"` and `secure` option to `"false"`
  * Make sure to set database options in environment variables, for example:
  ```  
       PG_DB_USER = "jack"
